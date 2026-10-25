@@ -1,0 +1,46 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  }
+  
+  h1, h2, h3, .font-serif {
+    font-family: 'Playfair Display', Georgia, serif;
+  }
+}
+
+/* Custom boutique scrollbar */
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+::-webkit-scrollbar-track {
+  background: #FFF9F2;
+}
+::-webkit-scrollbar-thumb {
+  background: #F1DCE4;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #D6336C;
+}
+
+.gold-gradient {
+  background: linear-gradient(135deg, #C9A34E 0%, #E6CA85 50%, #B28F3F 100%);
+}
+
+.pink-gradient {
+  background: linear-gradient(135deg, #D6336C 0%, #A61E4D 100%);
+}
+
+.gold-border {
+  border-color: #C9A34E;
+}
+
+.subtle-ring {
+  box-shadow: 0 0 0 1px rgba(214, 51, 108, 0.15);
+}

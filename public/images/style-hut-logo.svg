@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 80" width="320" height="80">
+  <defs>
+    <linearGradient id="roseGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#D6336C" />
+      <stop offset="100%" stop-color="#A61E4D" />
+    </linearGradient>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#C9A34E" />
+      <stop offset="100%" stop-color="#E6CA85" />
+    </linearGradient>
+  </defs>
+  <!-- Stylized Monogram / Hut Emblem -->
+  <path d="M 20 45 L 35 20 L 50 45 Z" fill="none" stroke="url(#roseGrad)" stroke-width="3" stroke-linejoin="round" />
+  <circle cx="35" cy="20" r="3" fill="url(#goldGrad)" />
+  <path d="M 27 45 L 27 58 L 43 58 L 43 45" fill="none" stroke="url(#roseGrad)" stroke-width="3" />
+  <!-- Typography -->
+  <text x="65" y="44" font-family="'Playfair Display', Georgia, serif" font-size="28" font-weight="700" fill="#33242A" letter-spacing="1">STYLE</text>
+  <text x="165" y="44" font-family="'Playfair Display', Georgia, serif" font-size="28" font-weight="700" fill="#D6336C" letter-spacing="1">HUT</text>
+  <circle cx="235" cy="40" r="3" fill="#C9A34E" />
+  <text x="66" y="60" font-family="'Plus Jakarta Sans', sans-serif" font-size="8" font-weight="600" fill="#7A6B72" letter-spacing="4">BE YOUR OWN STYLE</text>
+</svg>
