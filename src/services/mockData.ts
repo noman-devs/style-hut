@@ -1,4 +1,36 @@
-import { Banner, Category, PaymentSetting, Product, SocialLink, StoreSettings, Order } from '../types';
+import { Banner, Category, PaymentSetting, Product, ProductAttribute, SocialLink, StoreSettings, Order } from '../types';
+
+export const initialAttributes: ProductAttribute[] = [
+  {
+    id: 'attr-color',
+    name: 'Color',
+    slug: 'color',
+    values: [
+      { id: 'val-pink', attribute_id: 'attr-color', value: 'Blush Pink', color_hex: '#FFC0CB', is_active: true, sort_order: 1 },
+      { id: 'val-rose', attribute_id: 'attr-color', value: 'Deep Rose', color_hex: '#A61E4D', is_active: true, sort_order: 2 },
+      { id: 'val-black', attribute_id: 'attr-color', value: 'Midnight Black', color_hex: '#1F1418', is_active: true, sort_order: 3 },
+      { id: 'val-gold', attribute_id: 'attr-color', value: 'Ivory Gold', color_hex: '#C9A34E', is_active: true, sort_order: 4 },
+      { id: 'val-emerald', attribute_id: 'attr-color', value: 'Emerald Green', color_hex: '#008000', is_active: true, sort_order: 5 },
+      { id: 'val-white', attribute_id: 'attr-color', value: 'Pearl White', color_hex: '#FFFFFF', is_active: true, sort_order: 6 },
+      { id: 'val-blue', attribute_id: 'attr-color', value: 'Royal Blue', color_hex: '#0000FF', is_active: true, sort_order: 7 },
+      { id: 'val-red', attribute_id: 'attr-color', value: 'Ruby Red', color_hex: '#FF0000', is_active: true, sort_order: 8 },
+    ],
+  },
+  {
+    id: 'attr-size',
+    name: 'Size',
+    slug: 'size',
+    values: [
+      { id: 'val-xs', attribute_id: 'attr-size', value: 'XS', is_active: true, sort_order: 1 },
+      { id: 'val-s', attribute_id: 'attr-size', value: 'S', is_active: true, sort_order: 2 },
+      { id: 'val-m', attribute_id: 'attr-size', value: 'M', is_active: true, sort_order: 3 },
+      { id: 'val-l', attribute_id: 'attr-size', value: 'L', is_active: true, sort_order: 4 },
+      { id: 'val-xl', attribute_id: 'attr-size', value: 'XL', is_active: true, sort_order: 5 },
+      { id: 'val-xxl', attribute_id: 'attr-size', value: 'XXL', is_active: true, sort_order: 6 },
+      { id: 'val-free', attribute_id: 'attr-size', value: 'Free Size', is_active: true, sort_order: 7 },
+    ],
+  },
+];
 
 export const initialStoreSettings: StoreSettings = {
   store_name: 'Style Hut',
@@ -208,8 +240,8 @@ export const initialProducts: Product[] = [
         stock_quantity: 8,
         is_active: true,
         attribute_values: [
-          { attribute_id: 'attr-size', attribute_name: 'Size', value_id: 'val-s', value: 'Small (S)' },
-          { attribute_id: 'attr-color', attribute_name: 'Color', value_id: 'val-pink', value: 'Blush Pink' },
+          { attribute_id: 'attr-size', attribute_name: 'Size', value_id: 'val-s', value: 'S' },
+          { attribute_id: 'attr-color', attribute_name: 'Color', value_id: 'val-pink', value: 'Blush Pink', color_hex: '#FFC0CB' },
         ]
       },
       {
@@ -221,8 +253,8 @@ export const initialProducts: Product[] = [
         stock_quantity: 12,
         is_active: true,
         attribute_values: [
-          { attribute_id: 'attr-size', attribute_name: 'Size', value_id: 'val-m', value: 'Medium (M)' },
-          { attribute_id: 'attr-color', attribute_name: 'Color', value_id: 'val-pink', value: 'Blush Pink' },
+          { attribute_id: 'attr-size', attribute_name: 'Size', value_id: 'val-m', value: 'M' },
+          { attribute_id: 'attr-color', attribute_name: 'Color', value_id: 'val-pink', value: 'Blush Pink', color_hex: '#FFC0CB' },
         ]
       },
       {
@@ -234,8 +266,8 @@ export const initialProducts: Product[] = [
         stock_quantity: 6,
         is_active: true,
         attribute_values: [
-          { attribute_id: 'attr-size', attribute_name: 'Size', value_id: 'val-l', value: 'Large (L)' },
-          { attribute_id: 'attr-color', attribute_name: 'Color', value_id: 'val-pink', value: 'Blush Pink' },
+          { attribute_id: 'attr-size', attribute_name: 'Size', value_id: 'val-l', value: 'L' },
+          { attribute_id: 'attr-color', attribute_name: 'Color', value_id: 'val-pink', value: 'Blush Pink', color_hex: '#FFC0CB' },
         ]
       },
       {
@@ -247,8 +279,8 @@ export const initialProducts: Product[] = [
         stock_quantity: 6,
         is_active: true,
         attribute_values: [
-          { attribute_id: 'attr-size', attribute_name: 'Size', value_id: 'val-m', value: 'Medium (M)' },
-          { attribute_id: 'attr-color', attribute_name: 'Color', value_id: 'val-rose', value: 'Deep Rose' },
+          { attribute_id: 'attr-size', attribute_name: 'Size', value_id: 'val-m', value: 'M' },
+          { attribute_id: 'attr-color', attribute_name: 'Color', value_id: 'val-rose', value: 'Deep Rose', color_hex: '#A61E4D' },
         ]
       }
     ]
@@ -296,8 +328,8 @@ export const initialProducts: Product[] = [
         stock_quantity: 10,
         is_active: true,
         attribute_values: [
-          { attribute_id: 'attr-size', attribute_name: 'Size', value_id: 'val-m', value: 'Medium (M)' },
-          { attribute_id: 'attr-color', attribute_name: 'Color', value_id: 'val-rose', value: 'Deep Rose' }
+          { attribute_id: 'attr-size', attribute_name: 'Size', value_id: 'val-m', value: 'M' },
+          { attribute_id: 'attr-color', attribute_name: 'Color', value_id: 'val-rose', value: 'Deep Rose', color_hex: '#A61E4D' }
         ]
       },
       {
@@ -309,8 +341,8 @@ export const initialProducts: Product[] = [
         stock_quantity: 10,
         is_active: true,
         attribute_values: [
-          { attribute_id: 'attr-size', attribute_name: 'Size', value_id: 'val-l', value: 'Large (L)' },
-          { attribute_id: 'attr-color', attribute_name: 'Color', value_id: 'val-rose', value: 'Deep Rose' }
+          { attribute_id: 'attr-size', attribute_name: 'Size', value_id: 'val-l', value: 'L' },
+          { attribute_id: 'attr-color', attribute_name: 'Color', value_id: 'val-rose', value: 'Deep Rose', color_hex: '#A61E4D' }
         ]
       }
     ]

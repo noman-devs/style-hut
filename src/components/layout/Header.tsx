@@ -25,7 +25,7 @@ export const Header: React.FC = () => {
   const navigate = useNavigate();
   const { totalItems, openCart } = useCart();
   const { totalWishlist } = useWishlist();
-  const { user, profile, isAdmin, logout, toggleDemoAdmin } = useAuth();
+  const { user, profile, isAdmin, isSuperAdmin, logout } = useAuth();
   const { settings, categories, isSupabaseLive } = useStore();
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -102,14 +102,24 @@ export const Header: React.FC = () => {
               </span>
             </div>
 
-            {/* Quick Demo Admin Switcher */}
-            <button
-              onClick={toggleDemoAdmin}
-              className="text-[11px] bg-white/20 hover:bg-white/30 px-2.5 py-0.5 rounded-full transition-colors flex items-center gap-1"
-            >
-              <ShieldCheck className="w-3 h-3 text-brand-gold" />
-              {isAdmin ? 'Admin Mode: ON' : 'Switch to Admin'}
-            </button>
+            {/* Admin Portal Link */}
+            {isAdmin ? (
+              <Link
+                to="/admin"
+                className="text-[11px] bg-white/20 hover:bg-white/30 px-2.5 py-0.5 rounded-full transition-colors flex items-center gap-1 font-bold"
+              >
+                <ShieldCheck className="w-3 h-3 text-brand-gold" />
+                <span>{isSuperAdmin ? 'Super Admin' : 'Admin'}</span>
+              </Link>
+            ) : (
+              <Link
+                to="/login?admin=1"
+                className="text-[11px] bg-white/10 hover:bg-white/20 px-2 py-0.5 rounded-full transition-colors flex items-center gap-1"
+              >
+                <ShieldCheck className="w-3 h-3 text-brand-gold" />
+                <span>Admin Login</span>
+              </Link>
+            )}
           </div>
         </div>
       </div>
@@ -258,7 +268,7 @@ export const Header: React.FC = () => {
                         </p>
                         {isAdmin && (
                           <span className="inline-block mt-1 text-[10px] bg-brand-softPink text-brand-rose px-2 py-0.5 rounded-full font-bold">
-                            Administrator
+                            {isSuperAdmin ? '👑 Super Admin' : '🛡️ Regular Admin'}
                           </span>
                         )}
                       </div>

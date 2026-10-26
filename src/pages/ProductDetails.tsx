@@ -20,6 +20,55 @@ import {
   Zap
 } from 'lucide-react';
 
+const DEFAULT_COLOR_HEX: Record<string, string> = {
+  pink: '#D6336C',
+  'magenta pink': '#D6336C',
+  rose: '#C2185B',
+  'deep rose': '#A61E4D',
+  'soft pink': '#FCE7EF',
+  black: '#1F2937',
+  white: '#FFFFFF',
+  red: '#DC2626',
+  blue: '#2563EB',
+  'royal blue': '#1D4ED8',
+  'navy blue': '#1E3A8A',
+  green: '#16A34A',
+  'emerald green': '#059669',
+  'bottle green': '#0F5132',
+  olive: '#556B2F',
+  yellow: '#EAB308',
+  mustard: '#D97706',
+  maroon: '#800000',
+  purple: '#7E22CE',
+  ivory: '#FFF9F2',
+  cream: '#FFFDD0',
+  gold: '#C9A34E',
+  silver: '#C0C0C0',
+  grey: '#6B7280',
+  gray: '#6B7280',
+  orange: '#EA580C',
+  peach: '#FFDAB9',
+  teal: '#0D9488',
+  burgundy: '#800020',
+};
+
+function isLightColor(hex: string): boolean {
+  const cleanHex = hex.replace('#', '');
+  if (cleanHex.length === 3) {
+    const r = parseInt(cleanHex[0] + cleanHex[0], 16);
+    const g = parseInt(cleanHex[1] + cleanHex[1], 16);
+    const b = parseInt(cleanHex[2] + cleanHex[2], 16);
+    return (r * 299 + g * 587 + b * 114) / 1000 > 170;
+  }
+  if (cleanHex.length === 6) {
+    const r = parseInt(cleanHex.substring(0, 2), 16);
+    const g = parseInt(cleanHex.substring(2, 4), 16);
+    const b = parseInt(cleanHex.substring(4, 6), 16);
+    return (r * 299 + g * 587 + b * 114) / 1000 > 170;
+  }
+  return false;
+}
+
 export const ProductDetails: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
@@ -45,7 +94,7 @@ export const ProductDetails: React.FC = () => {
           setProduct(prod);
           setSelectedImage(prod.images?.[0]?.image_url || 'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?auto=format&fit=crop&w=800&q=80');
 
-          // If variable product, select initial variant
+          // If variable product, select initial active variant
           if (prod.product_type === 'variable' && prod.variants && prod.variants.length > 0) {
             const firstActive = prod.variants.find(v => v.is_active && v.stock_quantity > 0) || prod.variants[0];
             setSelectedVariant(firstActive);
@@ -118,6 +167,8 @@ export const ProductDetails: React.FC = () => {
 
   // Group unique attribute options for variable products
   const attributeGroups: Record<string, string[]> = {};
+  const colorHexMap: Record<string, string> = {};
+
   if (isVariable && product.variants) {
     product.variants.forEach(variant => {
       variant.attribute_values?.forEach(av => {
@@ -127,29 +178,107 @@ export const ProductDetails: React.FC = () => {
         if (!attributeGroups[av.attribute_name].includes(av.value)) {
           attributeGroups[av.attribute_name].push(av.value);
         }
+        if (av.color_hex && (av.attribute_name.toLowerCase().includes('colo') || av.color_hex.startsWith('#'))) {
+          colorHexMap[av.value] = av.color_hex;
+        }
       });
     });
   }
 
-  const handleAttributeChange = (attributeName: string, value: string) => {
-    const updated = { ...selectedAttributes, [attributeName]: value };
-    setSelectedAttributes(updated);
+  const getColorHex = (name: string): string => {
+    if (colorHexMap[name]) return colorHexMap[name];
+    const lower = name.toLowerCase().trim();
+    if (DEFAULT_COLOR_HEX[lower]) return DEFAULT_COLOR_HEX[lower];
+    if (name.startsWith('#')) return name;
+    return '#D6336C';
+  };
 
-    // Find matching variant
-    if (product.variants) {
-      const match = product.variants.find(v => {
-        return Object.entries(updated).every(([attrKey, attrVal]) => {
-          return v.attribute_values?.some(av => av.attribute_name === attrKey && av.value === attrVal);
-        });
+  // Sort attribute group names: Color first, then Size, then others
+  const sortedAttributeNames = Object.keys(attributeGroups).sort((a, b) => {
+    const aIsColor = a.toLowerCase().includes('colo');
+    const bIsColor = b.toLowerCase().includes('colo');
+    if (aIsColor && !bIsColor) return -1;
+    if (!aIsColor && bIsColor) return 1;
+
+    const aIsSize = a.toLowerCase().includes('size');
+    const bIsSize = b.toLowerCase().includes('size');
+    if (aIsSize && !bIsSize) return -1;
+    if (!aIsSize && bIsSize) return 1;
+
+    return a.localeCompare(b);
+  });
+
+  const handleAttributeChange = (attributeName: string, value: string) => {
+    if (!product.variants || product.variants.length === 0) return;
+
+    const targetAttributes = { ...selectedAttributes, [attributeName]: value };
+
+    // 1. Check for exact match with targetAttributes
+    let matchedVariant = product.variants.find(v => {
+      return Object.entries(targetAttributes).every(([attrKey, attrVal]) => {
+        return v.attribute_values?.some(av => av.attribute_name === attrKey && av.value === attrVal);
       });
-      if (match) {
-        setSelectedVariant(match);
-        if (match.image_url) {
-          setSelectedImage(match.image_url);
+    });
+
+    // 2. If no exact match (e.g. this size isn't available in current color), find best active variant with this value
+    if (!matchedVariant) {
+      matchedVariant = product.variants.find(v => {
+        return v.is_active && v.stock_quantity > 0 && v.attribute_values?.some(av => av.attribute_name === attributeName && av.value === value);
+      }) || product.variants.find(v => {
+        return v.attribute_values?.some(av => av.attribute_name === attributeName && av.value === value);
+      });
+    }
+
+    if (matchedVariant) {
+      setSelectedVariant(matchedVariant);
+      if (matchedVariant.image_url) {
+        setSelectedImage(matchedVariant.image_url);
+      }
+      // Sync all attributes from the selected variant
+      const syncedAttrs: Record<string, string> = {};
+      matchedVariant.attribute_values?.forEach(av => {
+        syncedAttrs[av.attribute_name] = av.value;
+      });
+      setSelectedAttributes(syncedAttrs);
+      setQuantity(1);
+    } else {
+      setSelectedAttributes(targetAttributes);
+    }
+  };
+
+  const checkOptionAvailability = (attrName: string, optionVal: string) => {
+    if (!product.variants) return { exists: false, inStock: false };
+
+    const isSize = attrName.toLowerCase().includes('size');
+
+    // If it's a size option and a color is currently selected:
+    if (isSize) {
+      const currentColor = Object.entries(selectedAttributes).find(([k]) => k.toLowerCase().includes('colo'))?.[1];
+      if (currentColor) {
+        const specificVariant = product.variants.find(v => {
+          const hasColor = v.attribute_values?.some(av => av.attribute_name.toLowerCase().includes('colo') && av.value === currentColor);
+          const hasSize = v.attribute_values?.some(av => av.attribute_name.toLowerCase().includes('size') && av.value === optionVal);
+          return hasColor && hasSize;
+        });
+
+        if (specificVariant) {
+          return {
+            exists: true,
+            inStock: specificVariant.is_active && specificVariant.stock_quantity > 0,
+            stock: specificVariant.stock_quantity,
+          };
         }
-        setQuantity(1);
       }
     }
+
+    // General availability across variants having this attribute value
+    const matchingVariants = product.variants.filter(v =>
+      v.attribute_values?.some(av => av.attribute_name === attrName && av.value === optionVal)
+    );
+
+    const exists = matchingVariants.length > 0;
+    const inStock = matchingVariants.some(v => v.is_active && v.stock_quantity > 0);
+    return { exists, inStock };
   };
 
   const handleAddToCart = () => {
@@ -280,35 +409,125 @@ export const ProductDetails: React.FC = () => {
           </div>
 
           {/* Variable Product Attribute Selectors (Size, Color) */}
-          {isVariable && Object.keys(attributeGroups).length > 0 && (
-            <div className="space-y-4 pt-2">
-              {Object.entries(attributeGroups).map(([attrName, options]) => (
-                <div key={attrName} className="space-y-2">
-                  <div className="flex justify-between text-xs font-semibold text-brand-dark">
-                    <span>Select {attrName}:</span>
-                    <span className="text-brand-rose">{selectedAttributes[attrName]}</span>
-                  </div>
+          {isVariable && sortedAttributeNames.length > 0 && (
+            <div className="space-y-5 pt-2">
+              {sortedAttributeNames.map(attrName => {
+                const options = attributeGroups[attrName];
+                const isColor = attrName.toLowerCase().includes('colo');
+                const isSize = attrName.toLowerCase().includes('size');
+                const selectedVal = selectedAttributes[attrName];
 
-                  <div className="flex flex-wrap gap-2">
-                    {options.map(optionVal => {
-                      const isSelected = selectedAttributes[attrName] === optionVal;
-                      return (
-                        <button
-                          key={optionVal}
-                          onClick={() => handleAttributeChange(attrName, optionVal)}
-                          className={`px-4 py-2 rounded-xl text-xs font-bold transition-all border ${
-                            isSelected
-                              ? 'bg-brand-rose text-white border-brand-rose shadow-sm'
-                              : 'bg-white hover:bg-brand-softPink/40 text-brand-dark border-brand-border'
-                          }`}
-                        >
-                          {optionVal}
-                        </button>
-                      );
-                    })}
+                return (
+                  <div key={attrName} className="space-y-2.5">
+                    <div className="flex items-center justify-between text-xs font-semibold text-brand-dark">
+                      <span className="flex items-center gap-1.5">
+                        <span>Select {attrName}:</span>
+                        <span className="font-bold text-brand-rose">{selectedVal}</span>
+                      </span>
+                      {isSize && (
+                        <span className="text-[11px] text-brand-muted font-normal italic">
+                          Standard BD boutique sizing
+                        </span>
+                      )}
+                    </div>
+
+                    {/* COLOR SWATCHES */}
+                    {isColor ? (
+                      <div className="flex flex-wrap items-center gap-3">
+                        {options.map(optionVal => {
+                          const isSelected = selectedVal === optionVal;
+                          const hex = getColorHex(optionVal);
+                          const isLight = isLightColor(hex);
+                          const { inStock } = checkOptionAvailability(attrName, optionVal);
+
+                          return (
+                            <button
+                              key={optionVal}
+                              type="button"
+                              onClick={() => handleAttributeChange(attrName, optionVal)}
+                              title={`${optionVal}${!inStock ? ' (Sold Out)' : ''}`}
+                              className={`group relative flex items-center justify-center rounded-full transition-all duration-200 ${
+                                isSelected
+                                  ? 'ring-2 ring-offset-2 ring-brand-rose scale-110 shadow-md'
+                                  : 'hover:scale-105 shadow-sm hover:shadow'
+                              } ${!inStock ? 'opacity-50' : ''}`}
+                              style={{ width: '38px', height: '38px' }}
+                            >
+                              <span
+                                className="w-full h-full rounded-full border border-black/15 flex items-center justify-center transition-transform"
+                                style={{ backgroundColor: hex }}
+                              >
+                                {isSelected && (
+                                  <Check
+                                    className={`w-4 h-4 stroke-[2.5] ${
+                                      isLight ? 'text-brand-dark' : 'text-white'
+                                    }`}
+                                  />
+                                )}
+                                {!inStock && !isSelected && (
+                                  <span className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                                    <span className="w-full h-[1.5px] bg-rose-500/80 rotate-45" />
+                                  </span>
+                                )}
+                              </span>
+                              <span className="sr-only">{optionVal}</span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    ) : isSize ? (
+                      /* SIZE BUTTONS */
+                      <div className="flex flex-wrap items-center gap-2">
+                        {options.map(optionVal => {
+                          const isSelected = selectedVal === optionVal;
+                          const { exists, inStock } = checkOptionAvailability(attrName, optionVal);
+
+                          return (
+                            <button
+                              key={optionVal}
+                              type="button"
+                              onClick={() => handleAttributeChange(attrName, optionVal)}
+                              className={`min-w-[3.25rem] px-3.5 py-2 rounded-xl text-xs font-bold transition-all border ${
+                                isSelected
+                                  ? 'bg-brand-rose text-white border-brand-rose shadow-sm ring-1 ring-brand-rose'
+                                  : !exists
+                                  ? 'bg-gray-50 text-gray-400 border-dashed border-gray-200 opacity-50'
+                                  : !inStock
+                                  ? 'bg-gray-50 text-gray-400 border-dashed border-gray-300 opacity-60 line-through'
+                                  : 'bg-white hover:bg-brand-softPink/40 text-brand-dark border-brand-border shadow-sm'
+                              }`}
+                              title={!inStock ? 'Out of stock in this option' : undefined}
+                            >
+                              {optionVal}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    ) : (
+                      /* OTHER ATTRIBUTES */
+                      <div className="flex flex-wrap items-center gap-2">
+                        {options.map(optionVal => {
+                          const isSelected = selectedVal === optionVal;
+                          return (
+                            <button
+                              key={optionVal}
+                              type="button"
+                              onClick={() => handleAttributeChange(attrName, optionVal)}
+                              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all border ${
+                                isSelected
+                                  ? 'bg-brand-rose text-white border-brand-rose shadow-sm'
+                                  : 'bg-white hover:bg-brand-softPink/40 text-brand-dark border-brand-border'
+                              }`}
+                            >
+                              {optionVal}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
 

@@ -30,12 +30,14 @@ import { Dashboard as AdminDashboard } from './admin/Dashboard';
 import { Products as AdminProducts } from './admin/Products';
 import { ProductEditor as AdminProductEditor } from './admin/ProductEditor';
 import { Categories as AdminCategories } from './admin/Categories';
+import { Attributes as AdminAttributes } from './admin/Attributes';
 import { Orders as AdminOrders } from './admin/Orders';
 import { Inventory as AdminInventory } from './admin/Inventory';
 import { Customers as AdminCustomers } from './admin/Customers';
 import { Banners as AdminBanners } from './admin/Banners';
 import { Payments as AdminPayments } from './admin/Payments';
 import { Settings as AdminSettings } from './admin/Settings';
+import { AdminManagement } from './admin/AdminManagement';
 
 export function App() {
   return (
@@ -71,6 +73,7 @@ export function App() {
                     <Route path="products" element={<AdminProducts />} />
                     <Route path="products/new" element={<AdminProductEditor />} />
                     <Route path="products/edit/:id" element={<AdminProductEditor />} />
+                    <Route path="attributes" element={<AdminAttributes />} />
                     <Route path="categories" element={<AdminCategories />} />
                     <Route path="orders" element={<AdminOrders />} />
                     <Route path="inventory" element={<AdminInventory />} />
@@ -78,6 +81,7 @@ export function App() {
                     <Route path="banners" element={<AdminBanners />} />
                     <Route path="payments" element={<AdminPayments />} />
                     <Route path="settings" element={<AdminSettings />} />
+                    <Route path="admins" element={<AdminManagement />} />
                   </Route>
                 </Routes>
               </ToastProvider>

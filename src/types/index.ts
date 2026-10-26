@@ -3,12 +3,13 @@ export type ProductStatus = 'draft' | 'published' | 'archived';
 export type OrderStatus = 'pending' | 'confirmed' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
 export type PaymentStatus = 'unpaid' | 'awaiting_verification' | 'paid' | 'rejected' | 'refunded';
 export type PaymentProvider = 'cod' | 'bkash' | 'nagad' | 'rocket';
-export type UserRole = 'customer' | 'admin' | 'manager';
+export type UserRole = 'customer' | 'admin' | 'manager' | 'super_admin';
 
 export interface Profile {
   id: string;
   full_name: string;
   phone: string;
+  email?: string;
   role: UserRole;
   account_status: 'active' | 'blocked';
   created_at: string;
@@ -37,6 +38,9 @@ export interface ProductAttributeValue {
   id: string;
   attribute_id: string;
   value: string;
+  color_hex?: string | null;
+  is_active?: boolean;
+  sort_order?: number;
 }
 
 export interface ProductVariant {
@@ -53,6 +57,7 @@ export interface ProductVariant {
     attribute_name: string;
     value_id: string;
     value: string;
+    color_hex?: string | null;
   }[];
 }
 

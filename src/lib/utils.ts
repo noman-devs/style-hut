@@ -39,3 +39,22 @@ export function slugify(text: string): string {
     .replace(/[^\w-]+/g, '')
     .replace(/--+/g, '-');
 }
+
+const STORAGE_PREFIX = 'stylehut_';
+
+export function getLocal<T>(key: string, defaultValue: T): T {
+  try {
+    const item = localStorage.getItem(STORAGE_PREFIX + key);
+    return item ? JSON.parse(item) : defaultValue;
+  } catch {
+    return defaultValue;
+  }
+}
+
+export function setLocal<T>(key: string, value: T): void {
+  try {
+    localStorage.setItem(STORAGE_PREFIX + key, JSON.stringify(value));
+  } catch (e) {
+    console.error('Local storage error', e);
+  }
+}

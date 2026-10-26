@@ -1,11 +1,11 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { User, Package, Heart, LogOut, ShieldCheck, Mail, Phone, MapPin } from 'lucide-react';
+import { User, Package, Heart, LogOut, ShieldCheck, Mail, Phone, MapPin, ArrowRight } from 'lucide-react';
 
 export const Account: React.FC = () => {
   const navigate = useNavigate();
-  const { user, profile, logout, isAdmin } = useAuth();
+  const { user, profile, logout, isAdmin, isSuperAdmin, isRegularAdmin } = useAuth();
 
   if (!user) {
     return (
@@ -27,6 +27,39 @@ export const Account: React.FC = () => {
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16 space-y-8">
+
+      {/* Admin Notice Banner if logged in user is an administrator */}
+      {isAdmin && (
+        <div className="bg-gradient-to-r from-brand-rose via-brand-pink to-brand-rose text-white p-5 sm:p-6 rounded-3xl shadow-soft flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-3.5 text-center sm:text-left">
+            <div className="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center shrink-0">
+              <ShieldCheck className="w-6 h-6 text-brand-gold" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2 justify-center sm:justify-start">
+                <p className="font-serif font-bold text-base">
+                  {isSuperAdmin ? 'Super Administrator Access' : 'Regular Administrator Access'}
+                </p>
+                <span className="text-[10px] bg-white/25 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">
+                  {isSuperAdmin ? 'Full System' : 'Store Operations'}
+                </span>
+              </div>
+              <p className="text-xs text-white/90 mt-0.5">
+                {isSuperAdmin 
+                  ? 'Manage products, categories, orders, website settings, and administrative staff.' 
+                  : 'Manage products, colours & sizes, categories, orders, inventory, and website settings.'}
+              </p>
+            </div>
+          </div>
+          <Link
+            to="/admin"
+            className="shrink-0 px-6 py-2.5 bg-white text-brand-rose hover:bg-brand-ivory font-bold text-xs rounded-full shadow-sm transition-transform active:scale-95 flex items-center gap-2"
+          >
+            <span>Open Admin Dashboard</span>
+            <ArrowRight className="w-4 h-4" />
+          </Link>
+        </div>
+      )}
       
       {/* Profile Header */}
       <div className="bg-white p-6 sm:p-8 rounded-3xl border border-brand-border shadow-soft flex flex-col sm:flex-row items-center gap-6 text-center sm:text-left">
